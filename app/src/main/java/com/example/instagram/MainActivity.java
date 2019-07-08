@@ -22,6 +22,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            Log.d("LoginActivity", "Auto login.");
+            goToHome();
+        }
+
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
@@ -44,12 +50,6 @@ public class MainActivity extends AppCompatActivity {
                 signup(username, password);
             }
         });
-
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            Log.d("LoginActivity", "Auto login.");
-            goToHome();
-        }
     }
 
     private void login(String username, String password) {

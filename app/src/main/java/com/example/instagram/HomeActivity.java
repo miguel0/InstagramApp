@@ -1,27 +1,38 @@
 package com.example.instagram;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageButton;
+import android.view.Menu;
+import android.view.MenuItem;
+import com.example.instagram.model.Post;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
-public class HomeActivity extends AppCompatActivity {
-    private ImageButton btnLogout;
+import java.util.List;
 
+public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        btnLogout = findViewById(R.id.btnLogout);
+        final Post.Query postQuery = new Post.Query();
+        postQuery.getTop().withUser();
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
+        postQuery.findInBackground(new FindCallback<Post>() {
             @Override
-            public void onClick(View v) {
-                logout();
+            public void done(List<Post> objects, ParseException e) {
+                if (e == null) {
+                    for (int i=0; i<objects.size(); i++) {
+                        Log.d("HomeActivity", "desc: " + objects.get(i).getDescription()
+                                + " user: " + objects.get(i).getUser().getUsername());
+                    }
+                } else {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -33,5 +44,23 @@ public class HomeActivity extends AppCompatActivity {
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.itLogout) {
+            logout();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
