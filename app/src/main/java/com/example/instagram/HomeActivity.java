@@ -1,66 +1,52 @@
 package com.example.instagram;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import com.example.instagram.model.Post;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseUser;
-
-import java.util.List;
+import com.example.instagram.fragments.ComposeFragment;
+import com.example.instagram.fragments.HomeFragment;
+import com.example.instagram.fragments.UserFragment;
 
 public class HomeActivity extends AppCompatActivity {
+    private BottomNavigationView bottomNavigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        final Post.Query postQuery = new Post.Query();
-        postQuery.getTop().withUser();
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        final FragmentManager fragmentManager = getSupportFragmentManager();
 
-        postQuery.findInBackground(new FindCallback<Post>() {
+        // defining fragments
+        final Fragment fragment1 = new HomeFragment();
+        final Fragment fragment2 = new ComposeFragment();
+        final Fragment fragment3 = new UserFragment();
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void done(List<Post> objects, ParseException e) {
-                if (e == null) {
-                    for (int i=0; i<objects.size(); i++) {
-                        Log.d("HomeActivity", "desc: " + objects.get(i).getDescription()
-                                + " user: " + objects.get(i).getUser().getUsername());
-                    }
-                } else {
-                    e.printStackTrace();
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                Fragment fragment;
+                switch (menuItem.getItemId()) {
+                    case R.id.btnHome:
+                        fragment = fragment1;
+                        break;
+                    case R.id.btnCompose:
+                        fragment = fragment2;
+                        break;
+                    case R.id.btnUser:
+                    default:
+                        fragment = fragment3;
+                        break;
                 }
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                return true;
             }
         });
-    }
-
-    private void logout() {
-        Log.d("HomeActivity", "Logout");
-
-        ParseUser.logOut();
-        final Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.itLogout) {
-            logout();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        bottomNavigationView.setSelectedItemId(R.id.btnHome);
     }
 }
