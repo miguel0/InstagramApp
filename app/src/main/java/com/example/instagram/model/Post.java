@@ -8,9 +8,10 @@ import com.parse.ParseUser;
 
 @ParseClassName("Post")
 public class Post extends ParseObject {
-    private static final String KEY_USER = "user";
-    private static final String KEY_IMAGE = "image";
-    private static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_USER = "user";
+    public static final String KEY_IMAGE = "image";
+    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_CREATED_AT = "createdAt";
 
     public ParseUser getUser() {
         return getParseUser(KEY_USER);

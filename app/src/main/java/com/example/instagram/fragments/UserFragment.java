@@ -1,22 +1,26 @@
 package com.example.instagram.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.instagram.MainActivity;
+import com.example.instagram.PostAdapter;
 import com.example.instagram.R;
+import com.example.instagram.model.Post;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
-public class UserFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
+
+public class UserFragment extends HomeFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -25,26 +29,40 @@ public class UserFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        mPosts = new ArrayList<>();
+        rvPosts = view.findViewById(R.id.rvPosts);
+        adapter = new PostAdapter(getContext(), mPosts);
+        rvPosts.setAdapter(adapter);
 
-        TextView tvUserPage = view.findViewById(R.id.tvUserPage);
-        tvUserPage.setText(String.format("Hello, %s.", ParseUser.getCurrentUser().getUsername()));
+        LinearLayoutManager llm = new LinearLayoutManager(getContext());
+        rvPosts.setLayoutManager(llm);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPosts.getContext(), llm.getOrientation());
+        rvPosts.addItemDecoration(dividerItemDecoration);
 
-        Button btnLogout = view.findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();
-            }
-        });
+        TextView tvUsernamePage = view.findViewById(R.id.tvUsernamePage);
+        tvUsernamePage.setText(ParseUser.getCurrentUser().getUsername());
+
+        loadTopPosts();
     }
 
-    private void logout() {
-        Log.d("UserFragment", "Logout");
+    @Override
+    protected void loadTopPosts() {
+        final Post.Query postQuery = new Post.Query();
+        postQuery.getTop().withUser();
+        postQuery.setLimit(20);
+        postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
+        postQuery.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
 
-        ParseUser.logOut();
-        final Intent intent = new Intent(getContext(), MainActivity.class);
-        startActivity(intent);
-        getActivity().finish();
+        postQuery.findInBackground(new FindCallback<Post>() {
+            @Override
+            public void done(List<Post> objects, ParseException e) {
+                if (e == null) {
+                    mPosts.addAll(objects);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

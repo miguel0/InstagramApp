@@ -4,21 +4,26 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.instagram.PostAdapter;
 import com.example.instagram.R;
 import com.example.instagram.model.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
-    private RecyclerView rvPosts;
+    protected RecyclerView rvPosts;
+    protected PostAdapter adapter;
+    protected List<Post> mPosts;
 
     @Nullable
     @Override
@@ -28,23 +33,31 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        mPosts = new ArrayList<>();
         rvPosts = view.findViewById(R.id.rvPosts);
+        adapter = new PostAdapter(getContext(), mPosts);
+        rvPosts.setAdapter(adapter);
 
+        LinearLayoutManager llm = new LinearLayoutManager(getContext());
+        rvPosts.setLayoutManager(llm);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPosts.getContext(), llm.getOrientation());
+        rvPosts.addItemDecoration(dividerItemDecoration);
 
+        loadTopPosts();
     }
 
-    public void loadTopPosts() {
+    protected void loadTopPosts() {
         final Post.Query postQuery = new Post.Query();
         postQuery.getTop().withUser();
+        postQuery.setLimit(20);
+        postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
 
         postQuery.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> objects, ParseException e) {
                 if (e == null) {
-                    for (int i=0; i<objects.size(); i++) {
-                        Log.d("HomeActivity", "desc: " + objects.get(i).getDescription()
-                                + " user: " + objects.get(i).getUser().getUsername());
-                    }
+                    mPosts.addAll(objects);
+                    adapter.notifyDataSetChanged();
                 } else {
                     e.printStackTrace();
                 }
