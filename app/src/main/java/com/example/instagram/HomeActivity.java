@@ -38,6 +38,7 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (menuItem.getItemId()) {
                     case R.id.btnHome:
+                        ((ComposeFragment) fragment2).homeItem = menuItem;
                         fragment = fragment1;
                         break;
                     case R.id.btnCompose:
@@ -53,6 +54,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.btnHome);
+
     }
 
     // create an action bar button
