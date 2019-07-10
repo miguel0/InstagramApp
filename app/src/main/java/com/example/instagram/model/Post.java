@@ -43,10 +43,6 @@ public class Post extends ParseObject {
         put(KEY_DESCRIPTION, description);
     }
 
-    public void setCreatedAt(Date date) {
-        put(KEY_CREATED_AT, date);
-    }
-
     public static String getRelativeTimeAgo(Date date) {
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);

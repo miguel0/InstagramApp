@@ -8,13 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.example.instagram.model.Post;
 import com.parse.ParseFile;
-
 import java.util.List;
-
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {

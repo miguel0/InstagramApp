@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,7 @@ public class HomeFragment extends Fragment {
     protected RecyclerView rvPosts;
     protected PostAdapter adapter;
     protected List<Post> mPosts;
+    protected SwipeRefreshLayout swipeContainer;
 
     @Nullable
     @Override
@@ -38,12 +40,31 @@ public class HomeFragment extends Fragment {
         adapter = new PostAdapter(getContext(), mPosts);
         rvPosts.setAdapter(adapter);
 
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         rvPosts.setLayoutManager(llm);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPosts.getContext(), llm.getOrientation());
         rvPosts.addItemDecoration(dividerItemDecoration);
 
         loadTopPosts();
+    }
+
+    protected void refresh() {
+        mPosts.clear();
+        adapter.notifyDataSetChanged();
+        loadTopPosts();
+        swipeContainer.setRefreshing(false);
     }
 
     protected void loadTopPosts() {

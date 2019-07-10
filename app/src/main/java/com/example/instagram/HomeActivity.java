@@ -76,7 +76,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        Log.d("UserFragment", "Logout");
+        Log.d("HomeActivity", "Logout");
 
         ParseUser.logOut();
         final Intent intent = new Intent(this, MainActivity.class);
