@@ -1,6 +1,7 @@
 package com.example.instagram;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,11 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
+import com.example.instagram.model.ParcelPost;
 import com.example.instagram.model.Post;
 import com.parse.ParseFile;
+
+import org.parceler.Parcels;
+
 import java.util.List;
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private Context context;
@@ -41,7 +46,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         return posts.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView tvUsername;
         private ImageView ivImage;
         private TextView tvDescription;
@@ -54,6 +59,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             ivImage = itemView.findViewById(R.id.ivImage);
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvDate = itemView.findViewById(R.id.tvDate);
+
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Post post) {
@@ -65,8 +72,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             if (image != null) {
                 Glide.with(context)
                         .load(image.getUrl())
-                        .transform(new RoundedCornersTransformation(10, 10))
                         .into(ivImage);
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+
+            if (position != RecyclerView.NO_POSITION) {
+                Post post = posts.get(position);
+                ParcelPost parcelPost = new ParcelPost(post.getUser().getUsername(), post.getDescription(), Post.getRelativeTimeAgo(post.getCreatedAt()), post.getImage());
+                Intent intent = new Intent(context, PostDetail.class);
+                intent.putExtra(ParcelPost.class.getSimpleName(), Parcels.wrap(parcelPost));
+                context.startActivity(intent);
             }
         }
     }

@@ -1,13 +1,11 @@
 package com.example.instagram.model;
 
 import android.text.format.DateUtils;
-
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
