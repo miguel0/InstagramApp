@@ -36,10 +36,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ComposeFragment extends Fragment {
-    public final String APP_TAG = "MyCustomApp";
-    public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    public String photoFileName = "photo.jpg";
-    public File photoFile;
+    private final String APP_TAG = "MyCustomApp";
+    private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
+    private String photoFileName = "photo.jpg";
+    private File photoFile;
     public MenuItem homeItem;
 
     @Nullable

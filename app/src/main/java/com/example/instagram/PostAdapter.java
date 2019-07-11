@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,6 +60,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         private ImageView ivImage;
         private TextView tvDescription;
         private TextView tvDate;
+        private ImageView ibPfImage;
+        private Button btnUser;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -68,16 +71,42 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 tvUsername = itemView.findViewById(R.id.tvUsername);
                 tvDescription = itemView.findViewById(R.id.tvDescription);
                 tvDate = itemView.findViewById(R.id.tvDate);
+                ibPfImage = itemView.findViewById(R.id.ibPfImagePost);
+                btnUser = itemView.findViewById(R.id.btnUserDetail);
             }
 
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Post post) {
+        public void bind(final Post post) {
             if (!isGrid) {
                 tvUsername.setText(post.getUser().getUsername());
                 tvDescription.setText(post.getDescription());
                 tvDate.setText(Post.getRelativeTimeAgo(post.getCreatedAt()));
+
+                ParseFile pfImage = (ParseFile) post.getUser().get("profilePicture");
+                if (pfImage != null) {
+                    Glide.with(context)
+                            .load(pfImage.getUrl())
+                            .placeholder(R.drawable.ic_user_filled)
+                            .error(R.drawable.ic_user_filled)
+                            .into(ibPfImage);
+                } else {
+                    Glide.with(context)
+                            .load(R.drawable.ic_user_filled)
+                            .placeholder(R.drawable.ic_user_filled)
+                            .error(R.drawable.ic_user_filled)
+                            .into(ibPfImage);
+                }
+
+                btnUser.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HomeActivity.targetUser = post.getUser();
+                        Intent intent = new Intent(context, UserDetails.class);
+                        context.startActivity(intent);
+                    }
+                });
             }
 
             ParseFile image = post.getImage();
@@ -94,7 +123,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             if (position != RecyclerView.NO_POSITION) {
                 Post post = posts.get(position);
-                ParcelPost parcelPost = new ParcelPost(post.getUser().getUsername(), post.getDescription(), Post.getRelativeTimeAgo(post.getCreatedAt()), post.getImage());
+                ParcelPost parcelPost = new ParcelPost(post.getUser().getUsername(),
+                        post.getDescription(), Post.getRelativeTimeAgo(post.getCreatedAt()),
+                        post.getImage(), post.getUser());
+
                 Intent intent = new Intent(context, PostDetail.class);
                 intent.putExtra(ParcelPost.class.getSimpleName(), Parcels.wrap(parcelPost));
                 context.startActivity(intent);

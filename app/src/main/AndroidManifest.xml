@@ -22,7 +22,8 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".PostDetail"></activity>
+        <activity android:name=".UserDetails"></activity>
+        <activity android:name=".PostDetail" />
         <activity
             android:name=".HomeActivity"
             android:windowSoftInputMode="adjustPan" />

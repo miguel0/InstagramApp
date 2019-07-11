@@ -13,7 +13,7 @@
         android:title=""
         app:showAsAction="always" />
     <item
-        android:id="@+id/btnUser"
+        android:id="@+id/btnUserDetail"
         android:icon="@drawable/selector_user"
         android:title=""
         app:showAsAction="always" />

@@ -18,6 +18,7 @@ import com.parse.ParseUser;
 
 public class HomeActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
+    public static ParseUser targetUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +45,10 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.btnCompose:
                         fragment = fragment2;
                         break;
-                    case R.id.btnUser:
+                    case R.id.btnUserDetail:
                     default:
+                        HomeActivity.targetUser = ParseUser.getCurrentUser();
+                        ((UserFragment) fragment3).userItem = menuItem;
                         fragment = fragment3;
                         break;
                 }
@@ -79,6 +82,7 @@ public class HomeActivity extends AppCompatActivity {
         Log.d("HomeActivity", "Logout");
 
         ParseUser.logOut();
+        HomeActivity.targetUser = ParseUser.getCurrentUser();
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
