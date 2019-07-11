@@ -37,7 +37,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mPosts = new ArrayList<>();
         rvPosts = view.findViewById(R.id.rvPosts);
-        adapter = new PostAdapter(getContext(), mPosts);
+        adapter = new PostAdapter(getContext(), mPosts, false);
         rvPosts.setAdapter(adapter);
 
         swipeContainer = view.findViewById(R.id.swipeContainer);

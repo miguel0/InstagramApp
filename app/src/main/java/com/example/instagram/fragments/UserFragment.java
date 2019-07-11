@@ -4,8 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,7 @@ public class UserFragment extends HomeFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mPosts = new ArrayList<>();
         rvPosts = view.findViewById(R.id.rvPosts);
-        adapter = new PostAdapter(getContext(), mPosts);
+        adapter = new PostAdapter(getContext(), mPosts, true);
         rvPosts.setAdapter(adapter);
 
         swipeContainer = view.findViewById(R.id.swipeContainer);
@@ -47,10 +46,7 @@ public class UserFragment extends HomeFragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        LinearLayoutManager llm = new LinearLayoutManager(getContext());
-        rvPosts.setLayoutManager(llm);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPosts.getContext(), llm.getOrientation());
-        rvPosts.addItemDecoration(dividerItemDecoration);
+        rvPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         TextView tvUsernamePage = view.findViewById(R.id.tvUsernamePage);
         tvUsernamePage.setText(ParseUser.getCurrentUser().getUsername());

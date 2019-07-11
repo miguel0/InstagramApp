@@ -22,16 +22,24 @@ import java.util.List;
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private Context context;
     private List<Post> posts;
+    private boolean isGrid;
 
-    public PostAdapter(Context context, List<Post> posts) {
+    public PostAdapter(Context context, List<Post> posts, boolean isGrid) {
         this.context = context;
         this.posts = posts;
+        this.isGrid = isGrid;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_post, viewGroup, false);
+        View view;
+        if (isGrid) {
+            view = LayoutInflater.from(context).inflate(R.layout.item_post_grid, viewGroup, false);
+        } else {
+            view = LayoutInflater.from(context).inflate(R.layout.item_post, viewGroup, false);
+        }
+
         return new ViewHolder(view);
     }
 
@@ -55,18 +63,22 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            tvUsername = itemView.findViewById(R.id.tvUsername);
             ivImage = itemView.findViewById(R.id.ivImage);
-            tvDescription = itemView.findViewById(R.id.tvDescription);
-            tvDate = itemView.findViewById(R.id.tvDate);
+            if (!isGrid) {
+                tvUsername = itemView.findViewById(R.id.tvUsername);
+                tvDescription = itemView.findViewById(R.id.tvDescription);
+                tvDate = itemView.findViewById(R.id.tvDate);
+            }
 
             itemView.setOnClickListener(this);
         }
 
         public void bind(Post post) {
-            tvUsername.setText(post.getUser().getUsername());
-            tvDescription.setText(post.getDescription());
-            tvDate.setText(Post.getRelativeTimeAgo(post.getCreatedAt()));
+            if (!isGrid) {
+                tvUsername.setText(post.getUser().getUsername());
+                tvDescription.setText(post.getDescription());
+                tvDate.setText(Post.getRelativeTimeAgo(post.getCreatedAt()));
+            }
 
             ParseFile image = post.getImage();
             if (image != null) {

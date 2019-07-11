@@ -128,7 +128,7 @@ public class ComposeFragment extends Fragment {
                 }
 
                 // Load the taken image into a preview
-                ImageView ivPreview = (ImageView) getView().findViewById(R.id.ivPreview);
+                ImageView ivPreview = (ImageView) getView().findViewById(R.id.ivImage);
                 ivPreview.setImageBitmap(resizedBitmap);
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
