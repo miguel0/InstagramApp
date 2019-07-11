@@ -12,9 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.instagram.HomeActivity;
 import com.example.instagram.PostAdapter;
 import com.example.instagram.R;
 import com.example.instagram.model.Post;
+import com.example.instagram.utils.EndlessRecyclerViewScrollListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
@@ -26,6 +28,7 @@ public class HomeFragment extends Fragment {
     protected PostAdapter adapter;
     protected List<Post> mPosts;
     protected SwipeRefreshLayout swipeContainer;
+    protected EndlessRecyclerViewScrollListener scrollListener;
 
     @Nullable
     @Override
@@ -56,21 +59,33 @@ public class HomeFragment extends Fragment {
         rvPosts.setLayoutManager(llm);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPosts.getContext(), llm.getOrientation());
         rvPosts.addItemDecoration(dividerItemDecoration);
+        scrollListener = new EndlessRecyclerViewScrollListener(llm) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                HomeActivity.offset += 20;
+                loadTopPosts(HomeActivity.offset);
+            }
+        };
+        // Adds the scroll listener to RecyclerView
+        rvPosts.addOnScrollListener(scrollListener);
 
-        loadTopPosts();
+        loadTopPosts(HomeActivity.offset);
     }
 
     protected void refresh() {
+        HomeActivity.offset = 0;
         mPosts.clear();
         adapter.notifyDataSetChanged();
-        loadTopPosts();
+        loadTopPosts(HomeActivity.offset);
         swipeContainer.setRefreshing(false);
     }
 
-    protected void loadTopPosts() {
+    protected void loadTopPosts(int offset) {
         final Post.Query postQuery = new Post.Query();
         postQuery.getTop().withUser();
         postQuery.setLimit(20);
+        postQuery.setSkip(offset);
         postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
 
         postQuery.findInBackground(new FindCallback<Post>() {

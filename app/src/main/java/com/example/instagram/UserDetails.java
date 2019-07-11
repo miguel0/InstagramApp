@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.instagram.model.Post;
+import com.example.instagram.utils.EndlessRecyclerViewScrollListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -22,6 +23,7 @@ public class UserDetails extends AppCompatActivity {
     private PostAdapter adapter;
     private List<Post> mPosts;
     private SwipeRefreshLayout swipeContainer;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,8 @@ public class UserDetails extends AppCompatActivity {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        rvPosts.setLayoutManager(new GridLayoutManager(this, 3));
+        GridLayoutManager glm = new GridLayoutManager(this, 3);
+        rvPosts.setLayoutManager(glm);
 
         TextView tvUsernamePage = findViewById(R.id.tvUsernamePage);
         tvUsernamePage.setText(HomeActivity.targetUser.getUsername());
@@ -66,20 +69,33 @@ public class UserDetails extends AppCompatActivity {
                     .into(ivProfile);
         }
 
-        loadTopPosts();
+        scrollListener = new EndlessRecyclerViewScrollListener(glm) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                HomeActivity.offset += 20;
+                loadTopPosts(HomeActivity.offset);
+            }
+        };
+        // Adds the scroll listener to RecyclerView
+        rvPosts.addOnScrollListener(scrollListener);
+
+        loadTopPosts(HomeActivity.offset);
     }
 
     private void refresh() {
+        HomeActivity.offset = 0;
         mPosts.clear();
         adapter.notifyDataSetChanged();
-        loadTopPosts();
+        loadTopPosts(HomeActivity.offset);
         swipeContainer.setRefreshing(false);
     }
 
-    private void loadTopPosts() {
+    private void loadTopPosts(int offset) {
         final Post.Query postQuery = new Post.Query();
         postQuery.getTop().withUser();
         postQuery.setLimit(20);
+        postQuery.setSkip(offset);
         postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
         postQuery.whereEqualTo(Post.KEY_USER, HomeActivity.targetUser);
 

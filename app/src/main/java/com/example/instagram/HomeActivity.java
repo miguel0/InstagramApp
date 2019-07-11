@@ -19,12 +19,14 @@ import com.parse.ParseUser;
 public class HomeActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     public static ParseUser targetUser;
+    public static int offset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        HomeActivity.offset = 0;
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -39,6 +41,7 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (menuItem.getItemId()) {
                     case R.id.btnHome:
+                        HomeActivity.offset = 0;
                         ((ComposeFragment) fragment2).homeItem = menuItem;
                         fragment = fragment1;
                         break;
@@ -47,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
                         break;
                     case R.id.btnUserDetail:
                     default:
+                        HomeActivity.offset = 0;
                         HomeActivity.targetUser = ParseUser.getCurrentUser();
                         ((UserFragment) fragment3).userItem = menuItem;
                         fragment = fragment3;

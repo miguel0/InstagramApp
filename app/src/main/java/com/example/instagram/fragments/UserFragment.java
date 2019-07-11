@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -23,11 +24,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.instagram.BitmapScaler;
 import com.example.instagram.HomeActivity;
 import com.example.instagram.PostAdapter;
 import com.example.instagram.R;
 import com.example.instagram.model.Post;
+import com.example.instagram.utils.BitmapScaler;
+import com.example.instagram.utils.EndlessRecyclerViewScrollListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -71,7 +73,8 @@ public class UserFragment extends HomeFragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        rvPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        GridLayoutManager glm = new GridLayoutManager(getContext(), 3);
+        rvPosts.setLayoutManager(glm);
 
         TextView tvUsernamePage = view.findViewById(R.id.tvUsernamePage);
         tvUsernamePage.setText(HomeActivity.targetUser.getUsername());
@@ -98,14 +101,26 @@ public class UserFragment extends HomeFragment {
             }
         });
 
-        loadTopPosts();
+        scrollListener = new EndlessRecyclerViewScrollListener(glm) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                HomeActivity.offset += 20;
+                loadTopPosts(HomeActivity.offset);
+            }
+        };
+        // Adds the scroll listener to RecyclerView
+        rvPosts.addOnScrollListener(scrollListener);
+
+        loadTopPosts(HomeActivity.offset);
     }
 
     @Override
-    protected void loadTopPosts() {
+    protected void loadTopPosts(int offset) {
         final Post.Query postQuery = new Post.Query();
         postQuery.getTop().withUser();
         postQuery.setLimit(20);
+        postQuery.setSkip(offset);
         postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
         postQuery.whereEqualTo(Post.KEY_USER, HomeActivity.targetUser);
 
